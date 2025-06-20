@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Button, Form, FormGroup, FormLabel, FormControl, FormText } from 'react-bootstrap';
-import { MapPin, RefreshCw, FileJson, Route as RouteIcon, Palette, Search } from 'lucide-react'; // Added Search icon
+import { MapPin, RefreshCw, FileJson, Route as RouteIcon, Palette, Search } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -9,10 +9,9 @@ import 'leaflet-routing-machine';
 
 // Import Leaflet Control Geocoder CSS and JS
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
-import 'leaflet-control-geocoder'; // This directly extends L.Control
+import 'leaflet-control-geocoder';
 
-// Define map themes (tile layer URLs)
-// This array now includes a broader range of OpenStreetMap-based and other free/freemium options.
+// Define map themes (tile layer URLs) - (No changes to this array from previous response)
 const MAP_THEMES = [
     {
         name: "OpenStreetMap (Standard)",
@@ -20,52 +19,52 @@ const MAP_THEMES = [
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     },
     {
-        name: "Humanitarian OSM Standard (HOT)", // A slightly different, high-contrast OSM style
+        name: "Humanitarian OSM Standard (HOT)",
         url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a>'
     },
     {
-        name: "OpenTopoMap (Topographic)", // Excellent for hiking, showing elevation contours
+        name: "OpenTopoMap (Topographic)",
         url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
         attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
     },
     {
-        name: "Wikimedia Maps (Neutral)", // A clean, neutral style often used by Wikipedia
+        name: "Wikimedia Maps (Neutral)",
         url: "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png",
         attribution: '<a href="https://wikimediafoundation.org/wiki/Maps_terms_of_use">Wikimedia Maps</a> | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     },
     {
-        name: "CyclOSM (Cycling-focused)", // Highlights cycle paths and related infrastructure
+        name: "CyclOSM (Cycling-focused)",
         url: "https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png",
         attribution: '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - OpenStreetMap bicycle map">CyclOSM</a> | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     },
     {
-        name: "Thunderforest Outdoors (Requires API Key)", // Good for outdoor activities, trails, etc.
+        name: "Thunderforest Outdoors (Requires API Key)",
         url: "https://{s}.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=YOUR_THUNDERFOREST_API_KEY",
         attribution: '&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     },
     {
-        name: "Thunderforest OpenCycleMap (Requires API Key)", // Specifically for cycling, different details than CyclOSM
+        name: "Thunderforest OpenCycleMap (Requires API Key)",
         url: "https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=YOUR_THUNDERFOREST_API_KEY",
         attribution: '&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     },
     {
-        name: "Stadia Maps - Alidade Smooth (Requires API Key)", // Modern, light, and very clean aesthetic
+        name: "Stadia Maps - Alidade Smooth (Requires API Key)",
         url: "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=YOUR_STADIA_API_KEY",
         attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     },
     {
-        name: "Stadia Maps - Alidade Smooth Dark (Requires API Key)", // Dark version of Alidade Smooth
+        name: "Stadia Maps - Alidade Smooth Dark (Requires API Key)",
         url: "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key=YOUR_STADIA_API_KEY",
         attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     },
     {
-        name: "Stadia Maps - Stamen Toner (Requires API Key)", // A classic stark black & white minimalist map
+        name: "Stadia Maps - Stamen Toner (Requires API Key)",
         url: "https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png?api_key=YOUR_STADIA_API_KEY",
         attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://stamen.com/">Stamen Design</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     },
     {
-        name: "Stadia Maps - Stamen Watercolor (Requires API Key)", // An artistic, watercolor-painted look
+        name: "Stadia Maps - Stamen Watercolor (Requires API Key)",
         url: "https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.png?api_key=YOUR_STADIA_API_KEY",
         attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://stamen.com/">Stamen Design</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }
@@ -77,10 +76,10 @@ const WanderListBengaluru = () => {
     const [latitude, setLatitude] = useState('');
     const [longitude, setLongitude] = useState('');
     const [description, setDescription] = useState('');
-    const [error, setError] = useState('');
+    const [error, setError] = useState(''); // General error state
     const mapRef = useRef(null);
-    const markersLayerRef = useRef(null); // Ref for the marker layer group
-    const routingControlRef = useRef(null); // Ref for routing control
+    const markersLayerRef = useRef(null);
+    const routingControlRef = useRef(null);
     const [importData, setImportData] = useState('');
     const [isImportFormVisible, setIsImportFormVisible] = useState(false);
     const [startPoint, setStartPoint] = useState('');
@@ -89,7 +88,13 @@ const WanderListBengaluru = () => {
 
     // State for map theme
     const [currentThemeUrl, setCurrentThemeUrl] = useState(MAP_THEMES[0].url);
-    const currentTileLayerRef = useRef(null); // Ref for the active tile layer instance
+    const currentTileLayerRef = useRef(null);
+
+    // --- NEW EXTERNAL SEARCH FEATURE START ---
+    const [externalSearchQuery, setExternalSearchQuery] = useState('');
+    const [externalSearchError, setExternalSearchError] = useState(''); // Specific error for external search
+    const externalSearchMarkerRef = useRef(null); // Ref to hold the marker for the external search result
+    // --- NEW EXTERNAL SEARCH FEATURE END ---
 
     // Define marker icons directly (this part is fine and crucial)
     const defaultIcon = L.icon({
@@ -103,45 +108,101 @@ const WanderListBengaluru = () => {
     });
     L.Marker.prototype.options.icon = defaultIcon;
 
+    // --- NEW EXTERNAL SEARCH FUNCTION START ---
+    const handleExternalSearch = async (event) => {
+        event.preventDefault(); // Prevent page reload on form submission
+        setExternalSearchError(''); // Clear previous search errors
+
+        if (!externalSearchQuery.trim()) {
+            setExternalSearchError('Please enter a location to search.');
+            return;
+        }
+
+        if (!mapRef.current) {
+            setExternalSearchError('Map is not initialized.');
+            return;
+        }
+
+        try {
+            const encodedQuery = encodeURIComponent(externalSearchQuery);
+            // Nominatim API for geocoding
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodedQuery}&limit=1`;
+
+            const response = await fetch(url, {
+                // It's good practice to provide a User-Agent for Nominatim requests
+                headers: {
+                    'User-Agent': 'WanderListBengaluruApp/1.0 (your-email@example.com)' // Replace with your actual email
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data && data.length > 0) {
+                const lat = parseFloat(data[0].lat);
+                const lon = parseFloat(data[0].lon);
+                const displayName = data[0].display_name;
+
+                // Remove previous external search marker if it exists
+                if (externalSearchMarkerRef.current) {
+                    mapRef.current.removeLayer(externalSearchMarkerRef.current);
+                }
+
+                // Add a new marker for the search result
+                externalSearchMarkerRef.current = L.marker([lat, lon], { icon: defaultIcon })
+                    .bindPopup(`<b>Searched:</b> ${displayName}`)
+                    .addTo(mapRef.current)
+                    .openPopup(); // Automatically open the popup
+
+                // Center map on the search result with a suitable zoom level
+                mapRef.current.setView([lat, lon], 13);
+
+                setExternalSearchQuery(''); // Clear the search input after successful search
+            } else {
+                setExternalSearchError('No results found for your search query. Try a different query.');
+            }
+
+        } catch (error) {
+            console.error("Error during external search:", error);
+            setExternalSearchError(`Failed to search: ${error.message}. Please check your query or network.`);
+        }
+    };
+    // --- NEW EXTERNAL SEARCH FUNCTION END ---
+
     // Effect for initializing the map and marker layer group (runs once on mount)
     useEffect(() => {
         if (!mapRef.current) {
-            // Initialize the map with a default view (e.g., Bengaluru) first,
-            // so something is displayed while waiting for geolocation.
-            mapRef.current = L.map('map').setView([12.9716, 77.5946], 11); // Default to Bengaluru
+            mapRef.current = L.map('map').setView([12.9716, 77.5946], 11);
 
-            // Initialize the default tile layer and add it to the map
             const defaultTheme = MAP_THEMES.find(theme => theme.url === currentThemeUrl) || MAP_THEMES[0];
             currentTileLayerRef.current = L.tileLayer(defaultTheme.url, {
                 attribution: defaultTheme.attribution,
             }).addTo(mapRef.current);
 
-            // Initialize the feature group for markers and add it to the map
             markersLayerRef.current = L.featureGroup().addTo(mapRef.current);
 
-            // --- Add Search Control (Leaflet Control Geocoder) ---
-            // Ensure L.Control.Geocoder is available from the import
+            // Leaflet Control Geocoder (internal map search)
             if (L.Control.Geocoder) {
                 L.Control.geocoder({
-                    collapsed: true, // Keep the search control compact initially
-                    position: 'topleft', // Position it on the top-left of the map
-                    // Geocoder service (Nominatim is often default, but good to be explicit)
+                    collapsed: true,
+                    position: 'topleft', // Position internal search on the top-left
                     geocoder: L.Control.Geocoder.nominatim(),
-                    defaultMarkGeocode: true // Let the control add its own marker for the searched location
+                    defaultMarkGeocode: true
                 }).addTo(mapRef.current);
             } else {
                 console.error("L.Control.Geocoder is not defined. Check leaflet-control-geocoder import.");
             }
-            // --- End Search Control ---
 
-            // --- Geolocation Logic ---
+            // Geolocation Logic
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         const userLat = position.coords.latitude;
                         const userLng = position.coords.longitude;
-                        // Set map view to user's location with a more zoomed-in view
-                        mapRef.current.setView([userLat, userLng], 13); // Zoom level 13 is good for a city view
+                        mapRef.current.setView([userLat, userLng], 13);
                         console.log("Map centered on user's location:", userLat, userLng);
                     },
                     (error) => {
@@ -157,82 +218,65 @@ const WanderListBengaluru = () => {
                         alert(errorMessage);
                     },
                     {
-                        enableHighAccuracy: true, // Request more precise location
-                        timeout: 10000,           // Timeout after 10 seconds
-                        maximumAge: 0            // Don't use a cached position
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
                     }
                 );
             } else {
                 console.warn("Geolocation is not supported by your browser.");
                 alert("Geolocation not supported. Map defaulting to Bengaluru.");
             }
-            // --- End Geolocation Logic ---
         }
 
-        // Cleanup function for this specific effect (runs on unmount)
         return () => {
             if (mapRef.current) {
-                mapRef.current.remove(); // Remove the Leaflet map instance
-                mapRef.current = null;    // Nullify the ref
+                mapRef.current.remove();
+                mapRef.current = null;
             }
-            // Also nullify other Leaflet-related refs to prevent stale references
             markersLayerRef.current = null;
             routingControlRef.current = null;
-            currentTileLayerRef.current = null; // Clear tile layer ref too
+            currentTileLayerRef.current = null;
+            // --- NEW EXTERNAL SEARCH FEATURE CLEANUP ---
+            if (externalSearchMarkerRef.current) {
+                externalSearchMarkerRef.current = null; // Just nullify, map.remove() will handle layer removal
+            }
+            // --- END NEW EXTERNAL SEARCH FEATURE CLEANUP ---
         };
-    }, []); // Empty dependency array means this runs once on mount, cleans up on unmount
+    }, []);
 
-    // Effect for handling map theme changes
+    // ... (rest of your useEffects for theme, markers, routing - no changes needed here) ...
     useEffect(() => {
         if (!mapRef.current || !currentTileLayerRef.current) {
-            return; // Map or tile layer ref not initialized
+            return;
         }
-
-        // Remove the old tile layer from the map
         mapRef.current.removeLayer(currentTileLayerRef.current);
-
-        // Get the new theme details
         const newTheme = MAP_THEMES.find(theme => theme.url === currentThemeUrl) || MAP_THEMES[0];
-
-        // Create a new tile layer and add it to the map
         currentTileLayerRef.current = L.tileLayer(newTheme.url, {
             attribution: newTheme.attribution,
         }).addTo(mapRef.current);
+    }, [currentThemeUrl]);
 
-    }, [currentThemeUrl]); // Re-run when the selected theme URL changes
-
-    // Effect for rendering markers based on 'places' state (runs when places changes)
     useEffect(() => {
-        // Ensure both map and the marker layer group are initialized before interacting
         if (!mapRef.current || !markersLayerRef.current) {
             return;
         }
-
-        // Clear all existing markers from the feature group
         markersLayerRef.current.clearLayers();
-
-        // Add new markers for each place to the feature group
         places.forEach((place) => {
             L.marker([place.latitude, place.longitude])
                 .bindPopup(`<b>${place.name}</b><br>${place.description}`)
-                .addTo(markersLayerRef.current); // Add to the feature group, not directly to map
+                .addTo(markersLayerRef.current);
         });
-    }, [places]); // Re-run when places array changes
+    }, [places]);
 
-    // Effect for handling routing (runs when startPoint, endPoint, or places change)
     useEffect(() => {
-        // Ensure map is initialized before attempting any routing operations
         if (!mapRef.current) {
             return;
         }
-
-        // Always attempt to remove the existing routing control first
         if (routingControlRef.current) {
             mapRef.current.removeControl(routingControlRef.current);
-            routingControlRef.current = null; // Crucially, clear the ref after removing
+            routingControlRef.current = null;
         }
-
-        // Only create a new route if both start and end points are valid and different
         if (startPoint && endPoint && startPoint !== endPoint) {
             const startPlace = places.find(p => p.name === startPoint);
             const endPlace = places.find(p => p.name === endPoint);
@@ -257,15 +301,13 @@ const WanderListBengaluru = () => {
                 }).addTo(mapRef.current);
             }
         }
-
-        // Cleanup function for this specific effect (runs before re-execution or on unmount)
         return () => {
             if (mapRef.current && routingControlRef.current) {
                 mapRef.current.removeControl(routingControlRef.current);
                 routingControlRef.current = null;
             }
         };
-    }, [startPoint, endPoint, places, routeTrigger]); // Dependencies for this effect
+    }, [startPoint, endPoint, places, routeTrigger]);
 
     const handleAddDestination = (event) => {
         event.preventDefault();
@@ -302,7 +344,7 @@ const WanderListBengaluru = () => {
             description: desc,
         };
 
-        setPlaces([...places, newPlace]); // This state update will trigger the marker useEffect
+        setPlaces([...places, newPlace]);
         setDestinationName('');
         setLatitude('');
         setLongitude('');
@@ -310,32 +352,32 @@ const WanderListBengaluru = () => {
     };
 
     const refreshMap = () => {
-        // Guard against map not being initialized
         if (!mapRef.current) {
             console.warn("Map not initialized, cannot refresh.");
             return;
         }
 
-        // Clear markers only if the marker layer group exists
         if (markersLayerRef.current) {
             markersLayerRef.current.clearLayers();
         }
 
-        // Remove routing control only if it exists
         if (routingControlRef.current) {
             mapRef.current.removeControl(routingControlRef.current);
-            routingControlRef.current = null; // Crucially, clear the ref after removing
+            routingControlRef.current = null;
         }
 
-        // Reset map view to Bengaluru's center (or default if geolocation fails again)
-        mapRef.current.setView([12.9716, 77.5946], 11);
+        // --- NEW EXTERNAL SEARCH FEATURE RESET ---
+        if (externalSearchMarkerRef.current) {
+            mapRef.current.removeLayer(externalSearchMarkerRef.current);
+            externalSearchMarkerRef.current = null;
+        }
+        setExternalSearchQuery('');
+        setExternalSearchError('');
+        // --- END NEW EXTERNAL SEARCH FEATURE RESET ---
 
-        // Reset routing selection states
+        mapRef.current.setView([12.9716, 77.5946], 11);
         setStartPoint('');
         setEndPoint('');
-
-        // No need to manually re-add markers here; changing `places` state
-        // or importing data will trigger the marker `useEffect` automatically.
     };
 
     const handleImport = useCallback(() => {
@@ -344,7 +386,6 @@ const WanderListBengaluru = () => {
             if (Array.isArray(importedPlaces)) {
                 let validPlaces = [];
                 for (const place of importedPlaces) {
-                    // Robust validation for each place object
                     if (
                         typeof place.name === 'string' && place.name.trim() !== '' &&
                         typeof place.latitude === 'number' && !isNaN(place.latitude) && place.latitude >= -90 && place.latitude <= 90 &&
@@ -361,7 +402,7 @@ const WanderListBengaluru = () => {
                         console.warn('Invalid place object encountered during import, skipping:', place);
                     }
                 }
-                setPlaces(validPlaces); // This will trigger the marker useEffect
+                setPlaces(validPlaces);
                 setError('');
                 setImportData('');
                 setIsImportFormVisible(false);
@@ -384,16 +425,13 @@ const WanderListBengaluru = () => {
     };
 
     const handleCalculateRoute = () => {
-        // This part is correct for clearing any existing route
         if (mapRef.current && routingControlRef.current) {
             mapRef.current.removeControl(routingControlRef.current);
             routingControlRef.current = null;
         }
-        // Increment the trigger state to force the useEffect to re-evaluate
         setRouteTrigger(prev => prev + 1);
     };
 
-    // Handler for theme change dropdown
     const handleThemeChange = (e) => {
         setCurrentThemeUrl(e.target.value);
     };
@@ -405,15 +443,39 @@ const WanderListBengaluru = () => {
                     WanderList Bengaluru
                 </h1>
 
+                {/* --- NEW EXTERNAL SEARCH FEATURE JSX START --- */}
+                <div className="bg-white rounded shadow-md p-4 mb-4">
+                    <h2 className="text-2xl font-semibold text-gray-800 mb-4 d-flex align-items-center">
+                        <Search className="mr-2 h-4 w-4" /> External Place Search
+                    </h2>
+                    <Form onSubmit={handleExternalSearch}>
+                        <FormGroup className="mb-3 d-flex">
+                            <FormControl
+                                type="text"
+                                placeholder="Search for a place (e.g., 'Bengaluru Palace')"
+                                value={externalSearchQuery}
+                                onChange={(e) => setExternalSearchQuery(e.target.value)}
+                                className="mr-2" // Add margin for spacing between input and button
+                            />
+                            <Button variant="info" type="submit">
+                                Search
+                            </Button>
+                        </FormGroup>
+                        {externalSearchError && <p className="text-danger">{externalSearchError}</p>}
+                    </Form>
+                </div>
+                {/* --- NEW EXTERNAL SEARCH FEATURE JSX END --- */}
+
+
                 <div className="d-flex justify-content-between align-items-center mb-4">
-                    <div> {/* Left side: Theme dropdown */}
+                    <div>
                         <FormGroup className="mb-0 d-flex align-items-center">
                             <FormLabel className="mb-0 mr-2"><Palette className="mr-1 h-4 w-4" /> Map Theme:</FormLabel>
                             <FormControl
                                 as="select"
                                 value={currentThemeUrl}
                                 onChange={handleThemeChange}
-                                style={{ width: 'auto' }} // Adjust width as needed
+                                style={{ width: 'auto' }}
                             >
                                 {MAP_THEMES.map((theme) => (
                                     <option key={theme.url} value={theme.url}>
@@ -423,7 +485,7 @@ const WanderListBengaluru = () => {
                             </FormControl>
                         </FormGroup>
                     </div>
-                    <div> {/* Right side: Action buttons */}
+                    <div>
                         <Button variant="primary" onClick={refreshMap}>
                             <RefreshCw className="mr-2 h-4 w-4" /> Refresh Map
                         </Button>
@@ -432,7 +494,6 @@ const WanderListBengaluru = () => {
                         </Button>
                     </div>
                 </div>
-
 
                 {isImportFormVisible && (
                     <div className="bg-white rounded shadow-md p-4 mb-4">
@@ -459,7 +520,7 @@ const WanderListBengaluru = () => {
 
                 <div id="map" className="rounded mb-4" style={{ height: '400px' }}></div>
 
-                {places.length > 1 && ( // Only show routing options if there are at least two places
+                {places.length > 1 && (
                     <div className="bg-white rounded shadow-md p-4 mb-4">
                         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Calculate Route</h2>
                         <Form>
